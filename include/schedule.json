@@ -1,0 +1,11 @@
+[
+    {"date": "2024-10-21", "time": "13:42", "event": "Consumer Price Index (CPI)"},
+    {"date": "2024-10-21", "time": "13:42", "event": "Crude Oil Inventories"},
+    {"date": "2024-10-18", "time": "14:00", "event": "FOMC Minutes"},
+    {"date": "2024-10-19", "time": "08:30", "event": "Retail Sales"},
+    {"date": "2024-10-20", "time": "10:00", "event": "Building Permits"},
+    {"date": "2024-10-21", "time": "09:30", "event": "Existing Home Sales"},
+    {"date": "2024-10-22", "time": "13:37", "event": "New Home Sales"},
+    {"date": "2024-10-23", "time": "08:00", "event": "Jobless Claims"},
+    {"date": "2024-10-24", "time": "09:00", "event": "GDP Growth Rate"}
+]
