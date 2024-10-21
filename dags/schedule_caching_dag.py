@@ -6,7 +6,7 @@ from airflow.utils.dates import days_ago
 
 # Cleaned-up schedule.json content
 SCHEDULE_DATA = [
-    {"date": "2024-10-21", "time": "13:45", "event": "Crude Oil Inventories"},
+    {"date": "2024-10-21", "time": "13:50", "event": "Crude Oil Inventories"},
     {"date": "2024-10-18", "time": "14:00", "event": "FOMC Minutes"},
     {"date": "2024-10-19", "time": "08:30", "event": "Retail Sales"},
     {"date": "2024-10-20", "time": "10:00", "event": "Building Permits"},
