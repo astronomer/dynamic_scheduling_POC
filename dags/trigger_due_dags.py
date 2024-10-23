@@ -19,7 +19,7 @@ def load_schedule():
     schedule_json = Variable.get("schedule_json")
     return json.loads(schedule_json)
 
-# Updated filter_due_events function
+# Function to filter due events
 def filter_due_events():
     """Filter events that are scheduled to run at the current time."""
     schedule = load_schedule()
@@ -31,6 +31,26 @@ def filter_due_events():
         if pendulum.parse(f"{event['date']} {event['time']}").start_of('minute') == now.start_of('minute')
     ]
     return due_events
+
+# Function to print all child tasks and their runtimes
+def print_all_tasks():
+    """Print all child tasks, their runtimes, and minutes until next run."""
+    schedule = load_schedule()
+    now = pendulum.now()  # Get the current time
+
+    for event in schedule:
+        # Parse the event's scheduled time
+        event_time = pendulum.parse(f"{event['date']} {event['time']}")
+
+        # Calculate minutes until the event
+        minutes_until_run = (event_time - now).total_minutes()
+
+        # Print the event information
+        print(
+            f"Child DAG: {sanitize_dag_id(event['event'])}, "
+            f"Scheduled at: {event['date']} {event['time']}, "
+            f"Minutes until next run: {int(minutes_until_run)}"
+        )
 
 # Default arguments for the DAG
 default_args = {
@@ -44,20 +64,21 @@ default_args = {
 with DAG(
     "dynamic_event_trigger_dag",
     default_args=default_args,
-    schedule_interval="* * * * *",
+    schedule_interval=None,  # No automatic schedule; runs only when triggered manually
     catchup=False,
     tags=["dynamic", "event", "trigger"],
 ) as dag:
 
-    # Task to fetch and filter due events
-    def get_due_events(**context):
-        """Fetch due events to be triggered."""
-        return filter_due_events()
+    # Task to print all possible child tasks and their runtimes
+    print_tasks = PythonOperator(
+        task_id="print_all_tasks",
+        python_callable=print_all_tasks,
+    )
 
+    # Task to fetch and filter due events
     fetch_due_events = PythonOperator(
         task_id="fetch_due_events",
-        python_callable=get_due_events,
-        provide_context=True,
+        python_callable=filter_due_events,  # Directly call the function
     )
 
     # Task group to dynamically map TriggerDagRunOperator tasks
@@ -80,4 +101,4 @@ with DAG(
         trigger_tasks = fetch_due_events.output.map(create_trigger_task)
 
     # Set task dependencies
-    fetch_due_events >> trigger_group
+    print_tasks >> fetch_due_events >> trigger_group
