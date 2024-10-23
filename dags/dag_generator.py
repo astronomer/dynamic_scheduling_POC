@@ -11,7 +11,7 @@ def parse_datetime(date_str, time_str):
     return datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
 
 # DAG generator function
-def generate_dag(event_name, execution_date):
+def generate_dag(event_name, execution_date, schedule_interval):
     default_args = {
         "owner": "airflow",
         "start_date": execution_date,
@@ -21,7 +21,7 @@ def generate_dag(event_name, execution_date):
     with DAG(
         dag_id=f"generated_{event_name.lower().replace(' ', '_')}_dag",
         default_args=default_args,
-        schedule_interval=None,  # Ensures the DAG runs only once
+        schedule_interval=schedule_interval,  # Dynamic schedule interval
         catchup=False,
         is_paused_upon_creation=False,  # Ensures DAG is active upon creation
     ) as dag:
@@ -37,8 +37,9 @@ def generate_dag(event_name, execution_date):
 for entry in schedule_json:
     event_name = entry["event"]
     execution_date = parse_datetime(entry["date"], entry["time"])
+    schedule_interval = entry["schedule_interval"]
 
     # Create and register the DAG with the "generated_" prefix
     globals()[f"generated_{event_name.lower().replace(' ', '_')}_dag"] = generate_dag(
-        event_name, execution_date
+        event_name, execution_date, schedule_interval
     )
